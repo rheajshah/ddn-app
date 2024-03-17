@@ -1,32 +1,56 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import './Teams.css';
 
 function Teams() {
-  const [teams, setTeams] = useState([]);
+    // Define state to store the result
+    const [result, setResult] = useState(null);
 
-  useEffect(() => {
-    // Fetch teams data from the backend API
-    axios.get('/api/teams')
-      .then(response => {
-        setTeams(response.data);
-      })
-      .catch(error => {
-        console.error('Error fetching teams data:', error);
-      });
-  }, []);
+    // Function to call the API
+    const callAPI = (base, exponent) => {
+        // API endpoint
+        const apiUrl = 'https://dfze7gsm5a.execute-api.us-east-1.amazonaws.com/dev';
 
-  return (
-    <div>
-      <h1>Teams</h1>
-      <ul>
-        {teams.map(team => (
-          <li key={team.id}>
-            {team.name}, {team.city}, {team.state}, {team.gender}, {team.theme}, {team.instagram}
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
+        // Request body
+        const requestBody = {
+            base: base,
+            exponent: exponent
+        };
+
+        // Make the API call
+        axios.post(apiUrl, requestBody)
+            .then(response => {
+                setResult(response.data.body);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    };
+
+    return (
+        <div>
+            <h1>TO THE POWER OF MATH!</h1>
+            <form>
+                <label>Base number:</label>
+                <input type="text" id="base" />
+                <label>...to the power of:</label>
+                <input type="text" id="exponent" />
+                {/* Call the callAPI function on button click */}
+                <button
+                    type="button"
+                    onClick={() => {
+                        const base = document.getElementById('base').value;
+                        const exponent = document.getElementById('exponent').value;
+                        callAPI(base, exponent);
+                    }}
+                >
+                    CALCULATE
+                </button>
+            </form>
+            {/* Display the result */}
+            {result && <p>Result: {result}</p>}
+        </div>
+    );
 }
 
 export default Teams;
